@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
+    console.log(new Date(), req.method, req.url);
     next();
   }
 }
