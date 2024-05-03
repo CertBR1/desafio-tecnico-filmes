@@ -58,7 +58,6 @@ export class AuthService {
         try {
             const cacheData = await this.cacheManager.get(createLoginDto.username);
             if (cacheData) {
-                console.log('cacheData: ', cacheData);
                 return { access_token: cacheData };
             }
             const credenciais = await this.credenciaisRepository.findOneBy({ username: createLoginDto.username });
