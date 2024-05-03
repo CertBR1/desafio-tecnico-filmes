@@ -9,7 +9,11 @@ export class AuthMiddleware implements NestMiddleware {
   ) { }
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = req.headers.authorization.split(' ')[1];
+      const authorization = req.headers.authorization
+      if (!authorization) {
+        throw new HttpException('Token é obrigatório', HttpStatus.UNAUTHORIZED);
+      }
+      const token = authorization.split(' ')[1];
       if (!token) {
         throw new HttpException('Token é obrigatório', HttpStatus.UNAUTHORIZED);
       }
