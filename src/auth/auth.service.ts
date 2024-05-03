@@ -65,18 +65,30 @@ export class AuthService {
             }
             const payload = { username: credenciais.username, sub: credenciais.id };
             return {
-                access_token: this.jwtService.sign(payload),
+                access_token: this.gerarToken(payload),
             };
         } catch (error) {
+            Logger.error(error);
             console.log(error);
-
             throw new HttpException('Credenciais inválidas3', HttpStatus.BAD_REQUEST);
         }
     }
-    gerarToken() {
-        throw new Error('Method not implemented.');
+    gerarToken(payload: any) {
+        try {
+            return this.jwtService.sign(payload);
+        } catch (error) {
+            Logger.error(error);
+            console.log(error);
+            throw new HttpException('Erro ao gerar token', HttpStatus.BAD_REQUEST);
+        }
     }
-    validarToken() {
-        throw new Error('Method not implemented.');
+    validarToken(token: string) {
+        try {
+            return this.jwtService.verify(token);
+        } catch (error) {
+            Logger.error(error);
+            console.log(error);
+            throw new HttpException('Erro ao validar token', HttpStatus.BAD_REQUEST);
+        }
     }
 }

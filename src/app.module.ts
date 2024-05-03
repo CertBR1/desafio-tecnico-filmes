@@ -23,8 +23,8 @@ import { AuthMiddleware } from './auth/auth.middleware';
         synchronize: true
       }
     ),
-    FilmesModule,
     AuthModule,
+    FilmesModule,
     UsuarioModule
   ],
   controllers: [AppController],
