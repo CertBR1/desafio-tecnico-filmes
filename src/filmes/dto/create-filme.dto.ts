@@ -3,7 +3,7 @@ import { isArray, IsArray, IsNotEmpty, IsString } from "class-validator";
 export class CreateFilmeDto {
     @IsString({ message: 'O nome do filme deve ser uma string' })
     @IsNotEmpty({ message: 'O nome do filme não pode ser vazio' })
-    nome: string;
+    titulo: string;
 
     @IsString({ message: 'O nome do diretor deve ser uma string' })
     @IsNotEmpty({ message: 'O nome do diretor não pode ser vazio' })

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credenciais } from 'src/usuario/usuario/credenciais.entity';
 import { Usuario } from 'src/usuario/usuario/usuario.entity';
@@ -7,6 +7,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateLoginDto } from './dto/create-login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Cache } from 'cache-manager';
 @Injectable()
 export class AuthService {
     constructor(
@@ -15,7 +16,9 @@ export class AuthService {
         @InjectRepository(Usuario)
         private usuarioRepository: Repository<Usuario>,
         private dataSource: DataSource,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        @Inject('CACHE_MANAGER')
+        private cacheManager: Cache
     ) { }
     async registrar(createUsuarioDto: CreateUsuarioDto) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -52,25 +55,30 @@ export class AuthService {
         }
     }
     async login(createLoginDto: CreateLoginDto) {
-        console.log(createLoginDto);
-
         try {
+            const cacheData = await this.cacheManager.get(createLoginDto.username);
+            if (cacheData) {
+                console.log('cacheData: ', cacheData);
+                return { access_token: cacheData };
+            }
             const credenciais = await this.credenciaisRepository.findOneBy({ username: createLoginDto.username });
             if (!credenciais) {
-                throw new HttpException('Credenciais inválidas1', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Credenciais inválidas', HttpStatus.BAD_REQUEST);
             }
             const isValid = await bcrypt.compare(createLoginDto.senha, credenciais.senha);
             if (!isValid) {
-                throw new HttpException('Credenciais inválidas2', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Credenciais inválidas', HttpStatus.BAD_REQUEST);
             }
             const payload = { username: credenciais.username, sub: credenciais.id };
+            const access_token = this.gerarToken(payload);
+            await this.cacheManager.set(createLoginDto.username, access_token, 30000);
             return {
-                access_token: this.gerarToken(payload),
+                access_token
             };
         } catch (error) {
             Logger.error(error);
             console.log(error);
-            throw new HttpException('Credenciais inválidas3', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Credenciais inválidas', HttpStatus.BAD_REQUEST);
         }
     }
     gerarToken(payload: any) {

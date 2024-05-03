@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthMiddleware } from './auth/auth.middleware';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -23,6 +25,11 @@ import { AuthMiddleware } from './auth/auth.middleware';
         synchronize: true
       }
     ),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      ttl: 15 * 1000,
+    }),
     AuthModule,
     FilmesModule,
     UsuarioModule

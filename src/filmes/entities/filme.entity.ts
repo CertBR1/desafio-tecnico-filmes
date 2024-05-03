@@ -5,16 +5,13 @@ import { Genero } from './genero.entity';
 @Entity()
 export class Filme {
     @PrimaryGeneratedColumn()
-    filme_id: number;
+    id: number;
 
     @Column()
     titulo: string;
 
     @Column()
-    descricao: string;
-
-    @Column()
-    ano_lancamento: number;
+    ano: number;
 
     @Column()
     diretor: string;

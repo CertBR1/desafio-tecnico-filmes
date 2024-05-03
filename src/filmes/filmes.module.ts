@@ -7,10 +7,7 @@ import { Genero } from './entities/genero.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Filme,
-      Genero
-    ])
+    TypeOrmModule.forFeature([Filme, Genero])
   ],
   controllers: [FilmesController],
   providers: [FilmesService],
